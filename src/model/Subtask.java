@@ -3,25 +3,29 @@ package model;
 import entity.Status;
 
 public class Subtask extends Task {
-    private Epic epic;
+    private int epicId;
 
-    public Subtask(String title, String description, int id, Status status, Epic epic) {
+    public Subtask(String title, String description, int id, Status status, int epicId) {
         super(title, description, id, status);
-        this.epic = epic;
+        this.epicId = epicId;
     }
 
-    public Epic getEpic() {
-        return epic;
+    public int getEpicId() {
+        return epicId;
     }
 
-    public void setEpic(Epic epic) {
-        this.epic = epic;
+    public void setEpicId(int epicId) {
+        this.epicId = epicId;
     }
 
     @Override
     public String toString() {
         return "Subtask{" +
-                "epic=" + epic +
+                "epicId=" + epicId +
+                ", id=" + getId() +
+                ", name='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
                 '}';
     }
 }
