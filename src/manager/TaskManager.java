@@ -31,7 +31,14 @@ public class TaskManager {
         switch (taskType) {
             case TASK -> taskMap.put(id, new Task(title, description, id, Status.NEW));
             case EPIC -> epicMap.put(id, new Epic(title, description, id, Status.NEW));
-            case SUBTASK -> subtaskMap.put(id, new Subtask(title, description, id, Status.NEW, epicPartId));
+            case SUBTASK -> {
+                Subtask subtask = new Subtask(title, description, id, Status.NEW, epicPartId);
+                subtaskMap.put(id, subtask);
+                Epic epic = epicMap.get(epicPartId);
+                if (epic != null) {
+                    epic.addSubtask(subtask);
+                }
+            }
             default -> throw new IllegalArgumentException("Не известный тип задачи: " + taskType);
         }
     }
@@ -122,15 +129,13 @@ public class TaskManager {
         boolean allSubtasksNew = true;
         boolean allSubtasksDone = true;
 
-        for (Subtask subtask : subtaskMap.values()) {
-            if (subtask.getEpicId() == epicId) {
-                hasSubtasks = true;
-                if (subtask.getStatus() != Status.NEW) {
-                    allSubtasksNew = false;
-                }
-                if (subtask.getStatus() != Status.DONE) {
-                    allSubtasksDone = false;
-                }
+        for (Subtask subtask : epic.getSubtasks()) {
+            hasSubtasks = true;
+            if (subtask.getStatus() != Status.NEW) {
+                allSubtasksNew = false;
+            }
+            if (subtask.getStatus() != Status.DONE) {
+                allSubtasksDone = false;
             }
         }
 
