@@ -8,15 +8,24 @@ import model.Task;
 
 import java.util.HashMap;
 
+/**
+ * Класс TaskManager управляет задачами, эпиками и подзадачами.
+ */
 public class TaskManager {
     private static int id = 0;
-
 
     public HashMap<Integer, Task> taskMap = new HashMap<>();
     public HashMap<Integer, Epic> epicMap = new HashMap<>();
     public HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
 
-    //Создание новой задачи с нужным типом
+    /**
+     * Создает новую задачу, эпик или подзадачу в зависимости от типа задачи.
+     *
+     * @param taskType      тип задачи (TASK, EPIC, SUBTASK)
+     * @param title         заголовок задачи
+     * @param description   описание задачи
+     * @param epicPartId    id эпика, к которому относится подзадача (для SUBTASK)
+     */
     public void createNewTask(TaskType taskType, String title, String description, Integer epicPartId) {
         id = ++id;
         switch (taskType) {
@@ -27,7 +36,11 @@ public class TaskManager {
         }
     }
 
-    //Удаление списка задач по типу
+    /**
+     * Удаляет все задачи, эпики или подзадачи в зависимости от типа задачи.
+     *
+     * @param taskType тип задачи (TASK, EPIC, SUBTASK)
+     */
     public void deletedAllTypeTasks(TaskType taskType) {
         switch (taskType) {
             case TASK -> taskMap.clear();
@@ -37,7 +50,12 @@ public class TaskManager {
         }
     }
 
-    //Удаление задачи по id и типу
+    /**
+     * Удаляет задачу, эпик или подзадачу по id.
+     *
+     * @param id   id задачи, эпика или подзадачи
+     * @param type тип задачи (TASK, EPIC, SUBTASK)
+     */
     public void deleteById(int id, TaskType type) {
         switch (type) {
             case TASK -> taskMap.remove(id);
@@ -47,7 +65,16 @@ public class TaskManager {
         }
     }
 
-    //Обновление задачи по id и типу
+    /**
+     * Обновляет задачу, эпик или подзадачу по id.
+     *
+     * @param id            id задачи, эпика или подзадачи
+     * @param type          тип задачи (TASK, EPIC, SUBTASK)
+     * @param title         новый заголовок задачи
+     * @param description   новое описание задачи
+     * @param status        новый статус задачи
+     * @param epicPartId    id эпика, к которому относится подзадача (для SUBTASK)
+     */
     public void updateById(int id, TaskType type, String title, String description, Status status, Integer epicPartId) {
         switch (type) {
             case TASK:
@@ -70,12 +97,49 @@ public class TaskManager {
                 if (subtaskMap.containsKey(id)) {
                     Subtask updatedSubtask = new Subtask(title, description, id, status, epicPartId);
                     subtaskMap.put(id, updatedSubtask);
+                    calculateEpicStatus(updatedSubtask.getEpicId());
                 } else {
                     throw new IllegalArgumentException("Подзадача с id " + id + " не найдена");
                 }
                 break;
             default:
                 throw new IllegalArgumentException("Не известный тип задачи: " + type);
+        }
+    }
+
+    /**
+     * Пересчитывает статус эпика на основе статусов его подзадач.
+     *
+     * @param epicId id эпика
+     */
+    public void calculateEpicStatus(int epicId) {
+        Epic epic = epicMap.get(epicId);
+        if (epic == null) {
+            throw new IllegalArgumentException("Эпик с id " + epicId + " не найден");
+        }
+
+        boolean hasSubtasks = false;
+        boolean allSubtasksNew = true;
+        boolean allSubtasksDone = true;
+
+        for (Subtask subtask : subtaskMap.values()) {
+            if (subtask.getEpicId() == epicId) {
+                hasSubtasks = true;
+                if (subtask.getStatus() != Status.NEW) {
+                    allSubtasksNew = false;
+                }
+                if (subtask.getStatus() != Status.DONE) {
+                    allSubtasksDone = false;
+                }
+            }
+        }
+
+        if (!hasSubtasks || allSubtasksNew) {
+            epic.updateStatus(Status.NEW);
+        } else if (allSubtasksDone) {
+            epic.updateStatus(Status.DONE);
+        } else {
+            epic.updateStatus(Status.IN_PROGRESS);
         }
     }
 

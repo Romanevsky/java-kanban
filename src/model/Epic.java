@@ -18,7 +18,7 @@ public class Epic extends Task {
     }
 
     public void setSubtasks(List<Subtask> subtasks) {
-        subtasks = subtasks;
+        this.subtasks = subtasks;
     }
 
     public void addSubtask(Subtask subtask) {
@@ -28,4 +28,20 @@ public class Epic extends Task {
     public void removeSubtask(Subtask subtask) {
         subtasks.remove(subtask);
     }
+
+    public void updateStatus(Status status) {
+        this.setStatus(status);
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "id=" + getId() +
+                ", name='" + getTitle() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
+                ", subtasks=" + subtasks +
+                '}';
+    }
 }
+

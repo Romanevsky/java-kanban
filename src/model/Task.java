@@ -47,6 +47,10 @@ public class Task {
         this.status = status;
     }
 
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return String.format("Задача: {Id=%d," +
@@ -56,5 +60,4 @@ public class Task {
                 "}", id, title, description, status);
     }
 }
-
 
