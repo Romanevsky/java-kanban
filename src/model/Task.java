@@ -1,12 +1,14 @@
 package model;
 
 import entity.Status;
+import entity.TaskType;
 
 public class Task {
     private String title;
     private String description;
     private int id;
     private Status status;
+    private TaskType type;
 
     public Task(String title, String description, int id, Status status) {
         this.title = title;
@@ -49,6 +51,10 @@ public class Task {
 
     public void updateStatus(Status status) {
         this.status = status;
+    }
+
+    public TaskType getType() {
+        return type;
     }
 
     @Override

@@ -1,59 +1,61 @@
+import manager.TaskManager;
+import model.Epic;
+import model.Subtask;
+import model.Task;
 import entity.Status;
 import entity.TaskType;
-import manager.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
 
         // Создание задач
-        taskManager.createNewTask(TaskType.TASK, "Задача 1", "Описание задачи 1", null);
-        taskManager.createNewTask(TaskType.TASK, "Задача 2", "Описание задачи 2", null);
+        Task task1 = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
+        Task task2 = new Task("Задача 2", "Описание задачи 2", 2, Status.NEW);
 
-        // Создание эпиков с подзадачами
-        taskManager.createNewTask(TaskType.EPIC, "Эпик 1", "Описание эпика 1", null);
-        taskManager.createNewTask(TaskType.SUBTASK, "Подзадача 1", "Описание подзадачи 1", 3);
-        taskManager.createNewTask(TaskType.SUBTASK, "Подзадача 2", "Описание подзадачи 2", 3);
+        // Создание эпиков и подзадач
+        Epic epic1 = new Epic("Эпик 1", "Описание эпика 1", 1);
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", 1, Status.NEW, 1);
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", 2, Status.NEW, 1);
+        epic1.addSubtask(subtask1);
+        epic1.addSubtask(subtask2);
 
-        taskManager.createNewTask(TaskType.EPIC, "Эпик 2", "Описание эпика 2", null);
-        taskManager.createNewTask(TaskType.SUBTASK, "Подзадача 3", "Описание подзадачи 3", 6);
+        Epic epic2 = new Epic("Эпик 2", "Описание эпика 2", 2);
+        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", 3, Status.NEW, 2);
+        epic2.addSubtask(subtask3);
 
-        // Распечатка списков
-        System.out.println("Список задач: " + taskManager.taskMap);
-        System.out.println("Список эпиков: " + taskManager.epicMap);
-        System.out.println("Список подзадач: " + taskManager.subtaskMap);
+        // Добавление задач и эпиков в менеджер задач
+        taskManager.addNewTask(task1);
+        taskManager.addNewTask(task2);
+        taskManager.addNewEpic(epic1);
+        taskManager.addNewEpic(epic2);
 
-        // Изменение статусов
-        taskManager.updateById(1, TaskType.TASK, "Задача 1", "Описание задачи 1", Status.IN_PROGRESS, null);
-        taskManager.updateById(2, TaskType.TASK, "Задача 2", "Описание задачи 2", Status.DONE, null);
+        // Добавление подзадач в менеджер задач
+        taskManager.addNewSubtask(subtask1);
+        taskManager.addNewSubtask(subtask2);
+        taskManager.addNewSubtask(subtask3);
 
-        taskManager.updateById(4, TaskType.SUBTASK, "Подзадача 1", "Описание подзадачи 1", Status.DONE, 3);
-        taskManager.updateById(5, TaskType.SUBTASK, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, 3);
-        taskManager.updateById(7, TaskType.SUBTASK, "Подзадача 3", "Описание подзадачи 3", Status.DONE, 6);
+        // Распечатка списков эпиков, задач и подзадач
+        System.out.println("Список задач: " + taskManager.getTasks());
+        System.out.println("Список эпиков: " + taskManager.getEpics());
+        System.out.println("Список подзадач: " + taskManager.getSubtasks());
 
-        // Распечатка списков после изменения статусов
-        System.out.println("Список задач после изменения статуса: " + taskManager.taskMap);
-        System.out.println("Список эпиков после изменения статуса: " + taskManager.epicMap);
-        System.out.println("Список подзадач после изменения статуса: " + taskManager.subtaskMap);
+        // Изменение статусов объектов
+        task1.updateStatus(Status.IN_PROGRESS);
+        subtask1.updateStatus(Status.DONE);
+        epic1.updateStatus();
 
-        // Проверка статусов
-        System.out.println("Статус задачи 1 после изменения статуса соответствует: " + taskManager.taskMap.get(1).getStatus().equals(Status.IN_PROGRESS));
-        System.out.println("Статус задачи 2 после изменения статуса соответствует: " + taskManager.taskMap.get(2).getStatus().equals(Status.DONE));
-
-        System.out.println("Статус подзадачи 1 после изменения статуса соответствует: " + taskManager.subtaskMap.get(4).getStatus().equals(Status.DONE));
-        System.out.println("Статус подзадачи 2 после изменения статуса соответствует: " + taskManager.subtaskMap.get(5).getStatus().equals(Status.IN_PROGRESS));
-        System.out.println("Статус подзадачи 3 после изменения статуса соответствует: " + taskManager.subtaskMap.get(7).getStatus().equals(Status.DONE));
-
-        System.out.println("Статус эпика 1 после изменения статуса соответствует: " + taskManager.epicMap.get(3).getStatus().equals(Status.NEW));
-        System.out.println("Статус эпика 2 после изменения статуса соответствует: " + taskManager.epicMap.get(6).getStatus().equals(Status.NEW));
+        // Распечатка измененных объектов
+        System.out.println("Задача 1: " + task1);
+        System.out.println("Подзадача 1: " + subtask1);
+        System.out.println("Эпик 1: " + epic1);
 
         // Удаление задачи и эпика
         taskManager.deleteById(1, TaskType.TASK);
-        taskManager.deleteById(3, TaskType.EPIC);
+        taskManager.deleteById(1, TaskType.EPIC);
 
         // Распечатка списков после удаления
-        System.out.println("Список задач: " + taskManager.taskMap);
-        System.out.println("Список эпиков: " + taskManager.epicMap);
-        System.out.println("Список подзадач: " + taskManager.subtaskMap);
+        System.out.println("Список задач после удаления: " + taskManager.getTasks());
+        System.out.println("Список эпиков после удаления: " + taskManager.getEpics());
     }
 }

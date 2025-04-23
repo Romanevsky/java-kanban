@@ -1,16 +1,26 @@
 package model;
 
 import entity.Status;
+import entity.TaskType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private List<Subtask> subtasks;
+    private ArrayList<Integer> subtaskIds = new ArrayList<>();
 
-    public Epic(String title, String description, int id, Status status) {
-        super(title, description, id, status);
+    public Epic(String title, String description, int id) {
+        super(title, description, id, Status.NEW);
         subtasks = new ArrayList<>();
+    }
+
+    public ArrayList<Integer> getSubtaskIds() {
+        return subtaskIds;
+    }
+
+    public void cleanSubtaskIds() {
+        subtaskIds.clear();
     }
 
     public List<Subtask> getSubtasks() {
@@ -29,8 +39,28 @@ public class Epic extends Task {
         subtasks.remove(subtask);
     }
 
-    public void updateStatus(Status status) {
-        this.setStatus(status);
+    public void updateStatus() {
+        boolean hasSubtasks = false;
+        boolean allSubtasksNew = true;
+        boolean allSubtasksDone = true;
+
+        for (Subtask subtask : subtasks) {
+            hasSubtasks = true;
+            if (subtask.getStatus() != Status.NEW) {
+                allSubtasksNew = false;
+            }
+            if (subtask.getStatus() != Status.DONE) {
+                allSubtasksDone = false;
+            }
+        }
+
+        if (!hasSubtasks || allSubtasksNew) {
+            this.setStatus(Status.NEW);
+        } else if (allSubtasksDone) {
+            this.setStatus(Status.DONE);
+        } else {
+            this.setStatus(Status.IN_PROGRESS);
+        }
     }
 
     @Override
