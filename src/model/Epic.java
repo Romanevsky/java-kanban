@@ -1,7 +1,6 @@
 package model;
 
 import entity.Status;
-import entity.TaskType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,7 @@ public class Epic extends Task {
 
     public void addSubtask(Subtask subtask) {
         subtasks.add(subtask);
+        subtaskIds.add(subtask.getId());
     }
 
     public void removeSubtask(Subtask subtask) {
@@ -43,7 +43,6 @@ public class Epic extends Task {
         boolean hasSubtasks = false;
         boolean allSubtasksNew = true;
         boolean allSubtasksDone = true;
-
         for (Subtask subtask : subtasks) {
             hasSubtasks = true;
             if (subtask.getStatus() != Status.NEW) {

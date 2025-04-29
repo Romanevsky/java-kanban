@@ -1,4 +1,4 @@
-import manager.TaskManager;
+import manager.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -7,7 +7,7 @@ import entity.TaskType;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManagers = new InMemoryTaskManager();
 
         // Создание задач
         Task task1 = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
@@ -25,20 +25,20 @@ public class Main {
         epic2.addSubtask(subtask3);
 
         // Добавление задач и эпиков в менеджер задач
-        taskManager.addNewTask(task1);
-        taskManager.addNewTask(task2);
-        taskManager.addNewEpic(epic1);
-        taskManager.addNewEpic(epic2);
+        taskManagers.addNewTask(task1);
+        taskManagers.addNewTask(task2);
+        taskManagers.addNewEpic(epic1);
+        taskManagers.addNewEpic(epic2);
 
         // Добавление подзадач в менеджер задач
-        taskManager.addNewSubtask(subtask1);
-        taskManager.addNewSubtask(subtask2);
-        taskManager.addNewSubtask(subtask3);
+        taskManagers.addNewSubtask(subtask1);
+        taskManagers.addNewSubtask(subtask2);
+        taskManagers.addNewSubtask(subtask3);
 
         // Распечатка списков эпиков, задач и подзадач
-        System.out.println("Список задач: " + taskManager.getTasks());
-        System.out.println("Список эпиков: " + taskManager.getEpics());
-        System.out.println("Список подзадач: " + taskManager.getSubtasks());
+        System.out.println("Список задач: " + taskManagers.getTasks());
+        System.out.println("Список эпиков: " + taskManagers.getEpics());
+        System.out.println("Список подзадач: " + taskManagers.getSubtasks());
 
         // Изменение статусов объектов
         task1.updateStatus(Status.IN_PROGRESS);
@@ -51,11 +51,11 @@ public class Main {
         System.out.println("Эпик 1: " + epic1);
 
         // Удаление задачи и эпика
-        taskManager.deleteById(1, TaskType.TASK);
-        taskManager.deleteById(1, TaskType.EPIC);
+        taskManagers.deleteById(1, TaskType.TASK);
+        taskManagers.deleteById(1, TaskType.EPIC);
 
         // Распечатка списков после удаления
-        System.out.println("Список задач после удаления: " + taskManager.getTasks());
-        System.out.println("Список эпиков после удаления: " + taskManager.getEpics());
+        System.out.println("Список задач после удаления: " + taskManagers.getTasks());
+        System.out.println("Список эпиков после удаления: " + taskManagers.getEpics());
     }
 }
