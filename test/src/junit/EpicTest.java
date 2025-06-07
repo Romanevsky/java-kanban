@@ -1,4 +1,4 @@
-package test.junit;
+package junit;
 
 import entity.Status;
 import model.Epic;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class EpicTest {
+public class EpicTest {
     @Test
     public void testAddSubtask() {
         Epic epic = new Epic("Эпик 1", "Описание эпика 1", 1);
