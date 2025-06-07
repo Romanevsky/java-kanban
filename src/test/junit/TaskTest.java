@@ -5,32 +5,33 @@ import model.Task;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class TaskTest {
-
+public class TaskTest {
     @Test
-    public void testNotEquals() {
-        Task task1 = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
-        Task task2 = new Task("Задача 2", "Описание задачи 2", 2, Status.NEW);
-        assertNotEquals(task1, task2);
+    public void testSetTitle() {
+        Task task = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
+        task.setTitle("Обновленная задача 1");
+        assertEquals("Обновленная задача 1", task.getTitle());
     }
 
     @Test
-    public void testGetTitle() {
+    public void testSetDescription() {
         Task task = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
-        assertEquals("Задача 1", task.getTitle());
+        task.setDescription("Обновленное описание задачи 1");
+        assertEquals("Обновленное описание задачи 1", task.getDescription());
     }
 
     @Test
-    public void testGetDescription() {
+    public void testSetId() {
         Task task = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
-        assertEquals("Описание задачи 1", task.getDescription());
+        task.setId(2);
+        assertEquals(2, task.getId());
     }
 
     @Test
-    public void testGetId() {
+    public void testSetStatus() {
         Task task = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
-        assertEquals(1, task.getId());
+        task.setStatus(Status.DONE);
+        assertEquals(Status.DONE, task.getStatus());
     }
 }

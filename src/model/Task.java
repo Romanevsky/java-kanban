@@ -2,8 +2,9 @@ package model;
 
 import entity.Status;
 import entity.TaskType;
+import manager.InMemoryHistoryManager;
 
-public class Task {
+public class Task extends InMemoryHistoryManager.Node {
     private String title;
     private String description;
     private int id;
