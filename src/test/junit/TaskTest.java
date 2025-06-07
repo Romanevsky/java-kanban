@@ -7,13 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TaskTest {
+    
     @Test
     public void testSetTitle() {
         Task task = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
         task.setTitle("Обновленная задача 1");
         assertEquals("Обновленная задача 1", task.getTitle());
     }
-
+    
     @Test
     public void testSetDescription() {
         Task task = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);

@@ -95,7 +95,7 @@ public class InMemoryTaskManagerTest {
         taskManager.addNewTask(task);
         ArrayList<Task> tasks = taskManager.getTasks();
         assertEquals(1, tasks.size());
-        assertEquals(task, tasks.get(0));
+        assertEquals(task, tasks.getFirst());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class InMemoryTaskManagerTest {
         taskManager.addNewSubtask(subtask);
         ArrayList<Subtask> subtasks = taskManager.getSubtasks();
         assertEquals(1, subtasks.size());
-        assertEquals(subtask, subtasks.get(0));
+        assertEquals(subtask, subtasks.getFirst());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class InMemoryTaskManagerTest {
         taskManager.addNewEpic(epic);
         ArrayList<Epic> epics = taskManager.getEpics();
         assertEquals(1, epics.size());
-        assertEquals(epic, epics.get(0));
+        assertEquals(epic, epics.getFirst());
     }
 
     @Test
@@ -153,6 +153,6 @@ public class InMemoryTaskManagerTest {
         taskManager.getTask(task.getId());
         List<Task> history = taskManager.getHistory();
         assertEquals(1, history.size());
-        assertEquals(task, history.get(0));
+        assertEquals(task, history.getFirst());
     }
 }

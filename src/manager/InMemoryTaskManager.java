@@ -17,11 +17,11 @@ public class InMemoryTaskManager implements TaskManager {
     private static int epicId = 0;
     private static int subtaskId = 0;
 
-    private HashMap<Integer, Task> taskMap = new HashMap<>();
-    private HashMap<Integer, Epic> epicMap = new HashMap<>();
-    private HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
+    private final HashMap<Integer, Task> taskMap = new HashMap<>();
+    private final HashMap<Integer, Epic> epicMap = new HashMap<>();
+    private final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
 
-    private HistoryManager historyManager = Managers.getDefaultHistory();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public int addNewTask(Task task) {
