@@ -1,4 +1,4 @@
-package test.junit;
+package junit;
 
 import entity.Status;
 import model.Subtask;
