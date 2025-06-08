@@ -54,13 +54,17 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTypeTasks(TaskType taskType) {
         switch (taskType) {
-            case TASK -> taskMap.clear();
+            case TASK -> {
+                taskMap.clear();
+                historyManager.remove(taskMap.keySet());
+            }
             case EPIC -> {
                 for (Epic epic : epicMap.values()) {
                     epic.cleanSubtaskIds();
                     calculateEpicStatus(epic.getId());
                 }
                 epicMap.clear();
+                historyManager.remove(epicMap.keySet());
             }
             case SUBTASK -> {
                 for (Subtask subtask : subtaskMap.values()) {
@@ -70,10 +74,12 @@ public class InMemoryTaskManager implements TaskManager {
                     }
                 }
                 subtaskMap.clear();
+                historyManager.remove(subtaskMap.keySet());
             }
             default -> throw new IllegalArgumentException("Не известный тип задачи: " + taskType);
         }
     }
+
 
     @Override
     public void deleteById(int id, TaskType type) {

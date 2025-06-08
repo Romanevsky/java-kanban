@@ -5,11 +5,10 @@ import utils.HistoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final LinkedList<Task> history = new LinkedList<>();
     private final HashMap<Integer, Node> taskNodes = new HashMap<>();
     private Node first;
     private Node last;
@@ -20,7 +19,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (node != null) {
             removeNode(node);
         }
-        history.addLast(task);
         node = new Node();
         node.task = task;
         if (last != null) {
@@ -45,7 +43,18 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        List<Task> history = new ArrayList<>();
+        Node current = first;
+        while (current != null) {
+            history.add(current.task);
+            current = current.next;
+        }
+        return history;
+    }
+
+    @Override
+    public void remove(Set<Integer> integers) {
+
     }
 
     private void removeNode(Node node) {
@@ -59,7 +68,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         } else {
             last = node.prev;
         }
-        history.remove(node.task);
     }
 
     public static class Node {
