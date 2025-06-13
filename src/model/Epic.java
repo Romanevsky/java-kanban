@@ -1,6 +1,7 @@
 package model;
 
 import entity.Status;
+import entity.TaskType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +65,8 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "id=" + getId() +
-                ", name='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status=" + getStatus() +
-                ", subtasks=" + subtasks +
-                '}';
+        return String.format("%d,%s,%s,%s,%s,",
+                getId(), TaskType.EPIC, getTitle(), getStatus(), getDescription());
     }
 }
 

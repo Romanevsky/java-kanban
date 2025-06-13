@@ -1,4 +1,4 @@
-package junit;
+package src.junit;
 
 import entity.Status;
 import model.Task;

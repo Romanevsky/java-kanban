@@ -1,6 +1,7 @@
 package model;
 
 import entity.Status;
+import entity.TaskType;
 
 public class Subtask extends Task {
     private final int epicId;
@@ -20,12 +21,7 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{" +
-                "epicId=" + epicId +
-                ", id=" + getId() +
-                ", name='" + getTitle() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status=" + getStatus() +
-                '}';
+        return String.format("%d,%s,%s,%s,%s,%d",
+                getId(), TaskType.SUBTASK, getTitle(), getStatus(), getDescription(), getEpicId());
     }
 }

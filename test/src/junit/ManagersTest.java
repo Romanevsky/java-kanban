@@ -1,4 +1,4 @@
-package junit;
+package src.junit;
 
 import manager.Managers;
 import org.junit.jupiter.api.Test;

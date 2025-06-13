@@ -1,4 +1,4 @@
-package junit;
+package src.junit;
 
 import entity.Status;
 import model.Subtask;
@@ -31,6 +31,6 @@ class SubtaskTest {
     @Test
     public void testToString() {
         Subtask subtask = new Subtask("Подзадача 1", "Описание подзадачи 1", 1, Status.NEW, 1);
-        assertEquals("Subtask{epicId=1, id=1, name='Подзадача 1', description='Описание подзадачи 1', status=NEW}", subtask.toString());
+        assertEquals("1,SUBTASK,Подзадача 1,NEW,Описание подзадачи 1,1", subtask.toString());
     }
 }
