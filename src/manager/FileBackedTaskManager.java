@@ -21,7 +21,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
+    //Исправлено :)
     public static void main(String[] args) {
+        // Создание файла для сохранения данных
+        File file = new File("tasks.csv");
+
+        // Создание менеджера задач
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
+
         // Создание задач
         Task task1 = new Task("Задача 1", "Описание задачи 1", 1, Status.NEW);
         Task task2 = new Task("Задача 2", "Описание задачи 2", 2, Status.NEW);
@@ -37,12 +44,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         Epic epic2 = new Epic("Эпик 2", "Описание эпика 2", 2);
 
-        // Создание файла для сохранения данных
-        File file = new File("tasks.csv");
-
-        // Создание менеджера задач
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
-
         // Добавление задач и эпиков в менеджер задач
         taskManager.addNewTask(task1);
         taskManager.addNewTask(task2);
@@ -57,17 +58,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         // Сохранение данных в файл
         taskManager.save();
 
-        // Создание нового менеджера задач из файла
-        FileBackedTaskManager newTaskManager = FileBackedTaskManager.loadFromFile(file);
-
+        System.out.println("TASK NEW: " + taskManager);
         // Проверка сохранения задач, эпиков и подзадач
         System.out.println("Задачи:");
-        for (Task task : newTaskManager.getTasks()) {
+        for (Task task : taskManager.getTasks()) {
             System.out.println(task);
         }
 
-    }
+        System.out.println("Эпики:");
+        for (Epic epic : taskManager.getEpics()) {
+            System.out.println(epic);
+        }
 
+        System.out.println("Подзадачи:");
+        for (Subtask subtask : taskManager.getSubtasks()) {
+            System.out.println(subtask);
+        }
+    }
 
     private void save() {
         try (FileWriter writer = new FileWriter(file)) {
@@ -105,17 +112,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     Task task = TaskManager.fromString(line);
                     switch (task.getType()) {
                         case TASK:
-                            taskManager.addNewTask(task);
+                            taskManager.taskMap.put(task.getId(), task);
+                            if (task.getId() > taskId) {
+                                taskId = task.getId();
+                            }
                             break;
                         case EPIC:
-                            taskManager.addNewEpic((Epic) task);
+                            Epic epic = (Epic) task;
+                            taskManager.epicMap.put(epic.getId(), epic);
+                            if (epic.getId() > epicId) {
+                                epicId = epic.getId();
+                            }
                             break;
                         case SUBTASK:
                             Subtask subtask = (Subtask) task;
-                            taskManager.addNewSubtask(subtask);
-                            Epic epic = taskManager.getEpic(subtask.getEpicId());
-                            if (epic != null) {
-                                epic.addSubtask(subtask);
+                            taskManager.subtaskMap.put(subtask.getId(), subtask);
+                            if (subtask.getId() > subtaskId) {
+                                subtaskId = subtask.getId();
                             }
                             break;
                     }
@@ -124,7 +137,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при чтении данных из файла", e);
         }
-
         return taskManager;
     }
 
@@ -183,5 +195,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void calculateEpicStatus(int epicId) {
         super.calculateEpicStatus(epicId);
         save();
+    }
+
+    @Override
+    public String toString() {
+        return "FileBackedTaskManager{" +
+                "file=" + file +
+                ", taskMap=" + taskMap +
+                ", epicMap=" + epicMap +
+                ", subtaskMap=" + subtaskMap +
+                '}';
     }
 }
