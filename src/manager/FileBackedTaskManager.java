@@ -80,6 +80,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         for (Subtask subtask : loadedTaskManager.getSubtasks()) {
             System.out.println(subtask);
         }
+        //Исправлено :)
+        System.out.println("Подзадачи эпика с идентификатором 1:");
+        System.out.println(loadedTaskManager.getEpic(1).getSubtasks());
     }
 
     private void save() {
@@ -139,6 +142,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     taskManager.subtaskMap.put(subtask.getId(), subtask);
                     if (subtask.getId() > taskManager.taskID) {
                         taskManager.taskID = subtask.getId();
+                    }
+                    // Добавляем подзадачу в соответствующий эпик
+                    Epic epic = taskManager.epicMap.get(subtask.getEpicId());
+                    if (epic != null) {
+                        epic.addSubtask(subtask);
                     }
                 }
             }
