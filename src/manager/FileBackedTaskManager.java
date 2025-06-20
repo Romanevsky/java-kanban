@@ -62,7 +62,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         // Сохранение данных в файл
         taskManager.save();
-
         // Загрузка данных из файла
         FileBackedTaskManager loadedTaskManager = FileBackedTaskManager.loadFromFile(file);
 
@@ -114,19 +113,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         // Создаем новый менеджер задач
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
 
-        // Читаем данные из файла
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             for (String line : lines) {
-                // Пропускаем заголовок CSV файла
                 if (line.startsWith("id,type,name,status,description,epic")) {
                     continue;
                 }
 
-                // Разбиваем строку на поля
                 String[] fields = line.split(",");
 
-                // Создаем задачу, эпик или подзадачу в зависимости от типа
                 if (fields[1].equals("TASK")) {
                     Task task = new Task(fields[2], fields[4], Integer.parseInt(fields[0]), Status.valueOf(fields[3]));
                     taskManager.taskMap.put(task.getId(), task);
