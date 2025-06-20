@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int taskId = 0;
-    private static int epicId = 0;
-    private static int subtaskId = 0;
+    protected static int taskId = 0;
+    protected static int epicId = 0;
+    protected static int subtaskId = 0;
 
-    private final HashMap<Integer, Task> taskMap = new HashMap<>();
-    private final HashMap<Integer, Epic> epicMap = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
+    protected final HashMap<Integer, Task> taskMap = new HashMap<>();
+    protected final HashMap<Integer, Epic> epicMap = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -173,7 +173,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getTasks() {
-        return new ArrayList<>(taskMap.values());
+        ArrayList<Task> tasks = new ArrayList<>();
+        for (Task task : taskMap.values()) {
+            if (task.getType() == TaskType.TASK) {
+                tasks.add(task);
+            }
+        }
+        return tasks;
     }
 
     @Override
