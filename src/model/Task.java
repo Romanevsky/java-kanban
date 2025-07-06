@@ -2,14 +2,17 @@ package model;
 
 import entity.Status;
 import entity.TaskType;
-import manager.InMemoryHistoryManager;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-public class Task extends InMemoryHistoryManager.Node {
+public class Task {
     private String title;
     private String description;
     private int id;
-    private Status status;
-    private TaskType type;
+    protected Status status;
+    protected TaskType type;
+    protected LocalDateTime startTime;
+    protected Duration duration;
 
     public Task(String title, String description, int id, Status status) {
         this.title = title;
@@ -17,6 +20,13 @@ public class Task extends InMemoryHistoryManager.Node {
         this.id = id;
         this.status = status;
         this.type = TaskType.TASK;
+    }
+
+    public Task(String title, String description, int id, Status status,
+                LocalDateTime startTime, Duration duration) {
+        this(title, description, id, status);
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getTitle() {
@@ -51,39 +61,38 @@ public class Task extends InMemoryHistoryManager.Node {
         this.status = status;
     }
 
-    public void updateStatus(Status status) {
-        this.status = status;
-    }
-
     public TaskType getType() {
         return type;
     }
 
-    public Task fromString(String value) {
-        String[] values = value.split(",");
-        int id = Integer.parseInt(values[0]);
-        TaskType type = TaskType.valueOf(values[1]);
-        String title = values[2];
-        Status status = Status.valueOf(values[3]);
-        String description = values[4];
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
 
-        switch (type) {
-            case TASK:
-                return new Task(title, description, id, status);
-            case EPIC:
-                return new Epic(title, description, id);
-            case SUBTASK:
-                int epicId = Integer.parseInt(values[5]);
-                return new Subtask(title, description, id, status, epicId);
-            default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime == null || duration == null) {
+            return null;
         }
+        return startTime.plus(duration);
     }
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,",
-                getId(), TaskType.TASK, getTitle(), getStatus(), getDescription());
+        return String.format("%d,%s,%s,%s,%s,,%s,%s",
+                getId(), TaskType.TASK, getTitle(), getStatus(), getDescription(),
+                startTime != null ? startTime.toString() : "",
+                duration != null ? duration.toMinutes() : 0);
     }
 }
-

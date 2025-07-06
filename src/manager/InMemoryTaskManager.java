@@ -8,9 +8,8 @@ import model.Task;
 import utils.HistoryManager;
 import utils.TaskManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     protected static int taskId = 0;
@@ -22,12 +21,19 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
+    private final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
 
     @Override
     public int addNewTask(Task task) {
+        if (task.getStartTime() != null && task.getDuration() != null) {
+            checkIntersection(task);
+        }
         final int id = ++taskId;
         task.setId(id);
         taskMap.put(id, task);
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
         return id;
     }
 
@@ -41,6 +47,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addNewSubtask(Subtask subtask) {
+        if (subtask.getStartTime() != null && subtask.getDuration() != null) {
+            checkIntersection(subtask);
+        }
         final int id = ++subtaskId;
         subtask.setId(id);
         subtaskMap.put(id, subtask);
@@ -48,7 +57,40 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             epic.addSubtask(subtask);
         }
+        if (subtask.getStartTime() != null) {
+            prioritizedTasks.add(subtask);
+        }
         return id;
+    }
+
+    public boolean checkIntersection(Task task) {
+        if (task.getStartTime() == null || task.getDuration() == null) {
+            return false;
+        }
+
+        LocalDateTime start = task.getStartTime();
+        LocalDateTime end = task.getEndTime();
+
+        return prioritizedTasks.stream()
+                .anyMatch(other -> intersects(other, task));
+    }
+
+    private boolean intersects(Task a, Task b) {
+        if (a.getStartTime() == null || a.getDuration() == null ||
+                b.getStartTime() == null || b.getDuration() == null) {
+            return false;
+        }
+
+        LocalDateTime aStart = a.getStartTime();
+        LocalDateTime aEnd = a.getEndTime();
+        LocalDateTime bStart = b.getStartTime();
+        LocalDateTime bEnd = b.getEndTime();
+
+        return aStart.isBefore(bEnd) && bStart.isBefore(aEnd);
+    }
+
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
     }
 
     @Override
