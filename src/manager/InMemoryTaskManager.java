@@ -97,28 +97,38 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllTypeTasks(TaskType taskType) {
         switch (taskType) {
             case TASK -> {
-                taskMap.clear();
-                historyManager.remove(taskMap.keySet());
+                List<Task> tasks = new ArrayList<>(taskMap.values());
+                for (Task task : tasks) {
+                    taskMap.remove(task.getId());
+                    historyManager.remove(task.getId());
+                    prioritizedTasks.remove(task); // Удаление из отсортированного списка
+                }
             }
             case EPIC -> {
-                for (Epic epic : epicMap.values()) {
-                    epic.cleanSubtaskIds();
-                    calculateEpicStatus(epic.getId());
+                List<Epic> epics = new ArrayList<>(epicMap.values());
+                for (Epic epic : epics) {
+                    for (Subtask subtask : epic.getSubtasks()) {
+                        subtaskMap.remove(subtask.getId());
+                        historyManager.remove(subtask.getId());
+                        prioritizedTasks.remove(subtask); // Удаление из отсортированного списка
+                    }
+                    epicMap.remove(epic.getId());
+                    historyManager.remove(epic.getId());
                 }
-                epicMap.clear();
-                historyManager.remove(epicMap.keySet());
             }
             case SUBTASK -> {
-                for (Subtask subtask : subtaskMap.values()) {
+                List<Subtask> subtasks = new ArrayList<>(subtaskMap.values());
+                for (Subtask subtask : subtasks) {
+                    subtaskMap.remove(subtask.getId());
+                    historyManager.remove(subtask.getId());
                     Epic epic = epicMap.get(subtask.getEpicId());
                     if (epic != null) {
                         epic.removeSubtask(subtask);
                     }
+                    prioritizedTasks.remove(subtask); // Удаление из отсортированного списка
                 }
-                subtaskMap.clear();
-                historyManager.remove(subtaskMap.keySet());
             }
-            default -> throw new IllegalArgumentException("Не известный тип задачи: " + taskType);
+            default -> throw new IllegalArgumentException("Неизвестный тип задачи: " + taskType);
         }
     }
 
@@ -127,8 +137,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteById(int id, TaskType type) {
         switch (type) {
             case TASK -> {
-                taskMap.remove(id);
-                historyManager.remove(id);
+                Task task = taskMap.remove(id);
+                if (task != null) {
+                    historyManager.remove(id);
+                    prioritizedTasks.remove(task); // Удаление из отсортированного списка
+                }
             }
             case EPIC -> {
                 Epic epic = epicMap.remove(id);
@@ -147,6 +160,7 @@ public class InMemoryTaskManager implements TaskManager {
                         epic.removeSubtask(subtask);
                     }
                     historyManager.remove(id);
+                    prioritizedTasks.remove(subtask); // Удаление из отсортированного списка
                 }
             }
             default -> throw new IllegalArgumentException("Не известный тип задачи: " + type);

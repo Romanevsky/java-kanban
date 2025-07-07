@@ -161,7 +161,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 Integer.parseInt(fields[0])
                         );
                         epic.setStartTime(startTime);
-                        epic.setDuration(duration);
 
                         // Восстанавливаем подзадачи
                         if (fields.length > 7 && !fields[7].isEmpty()) {
