@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -21,7 +23,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    //Исправлено :)
     public static void main(String[] args) {
         // Создание временного файла для сохранения данных
         File file = null;
@@ -80,7 +81,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         for (Subtask subtask : loadedTaskManager.getSubtasks()) {
             System.out.println(subtask);
         }
-        //Исправлено :)
         System.out.println("Подзадачи эпика с идентификатором 1:");
         System.out.println(loadedTaskManager.getEpic(1).getSubtasks());
     }
@@ -88,7 +88,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try (FileWriter writer = new FileWriter(file)) {
             // Записываем заголовок CSV файла
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,startTime,duration,epic\n");
 
             // Записываем задачи
             List<Task> tasks = getTasks();
@@ -119,26 +119,94 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             for (String line : lines) {
-                if (line.startsWith("id,type,name,status,description,epic")) {
+                if (line.startsWith("id,type,name,status,description,startTime,duration,epic")) {
                     continue;
                 }
 
                 String[] fields = line.split(",");
 
                 if (fields[1].equals("TASK")) {
-                    Task task = new Task(fields[2], fields[4], Integer.parseInt(fields[0]), Status.valueOf(fields[3]));
+                    Task task;
+                    if (fields.length >= 7 && !fields[5].isEmpty()) {
+                        LocalDateTime startTime = LocalDateTime.parse(fields[5]);
+                        Duration duration = Duration.ofMinutes(Long.parseLong(fields[6]));
+                        task = new Task(
+                                fields[2],
+                                fields[4],
+                                Integer.parseInt(fields[0]),
+                                Status.valueOf(fields[3]),
+                                startTime,
+                                duration
+                        );
+                    } else {
+                        task = new Task(
+                                fields[2],
+                                fields[4],
+                                Integer.parseInt(fields[0]),
+                                Status.valueOf(fields[3])
+                        );
+                    }
                     taskManager.taskMap.put(task.getId(), task);
                     if (task.getId() > taskManager.taskID) {
                         taskManager.taskID = task.getId();
                     }
                 } else if (fields[1].equals("EPIC")) {
-                    Epic epic = new Epic(fields[2], fields[4], Integer.parseInt(fields[0]));
+                    Epic epic;
+                    if (fields.length >= 8 && !fields[5].isEmpty()) {
+                        LocalDateTime startTime = LocalDateTime.parse(fields[5]);
+                        Duration duration = Duration.ofMinutes(Long.parseLong(fields[6]));
+                        epic = new Epic(
+                                fields[2],
+                                fields[4],
+                                Integer.parseInt(fields[0])
+                        );
+                        epic.setStartTime(startTime);
+
+                        // Восстанавливаем подзадачи
+                        if (fields.length > 7 && !fields[7].isEmpty()) {
+                            String[] subtaskIdsStr = fields[7].split(",");
+                            for (String subtaskIdStr : subtaskIdsStr) {
+                                int subtaskId = Integer.parseInt(subtaskIdStr);
+                                Subtask subtask = taskManager.subtaskMap.get(subtaskId);
+                                if (subtask != null) {
+                                    epic.addSubtask(subtask);
+                                }
+                            }
+                        }
+                    } else {
+                        epic = new Epic(
+                                fields[2],
+                                fields[4],
+                                Integer.parseInt(fields[0])
+                        );
+                    }
                     taskManager.epicMap.put(epic.getId(), epic);
                     if (epic.getId() > taskManager.taskID) {
                         taskManager.taskID = epic.getId();
                     }
                 } else if (fields[1].equals("SUBTASK")) {
-                    Subtask subtask = new Subtask(fields[2], fields[4], Integer.parseInt(fields[0]), Status.valueOf(fields[3]), Integer.parseInt(fields[5]));
+                    Subtask subtask;
+                    if (fields.length >= 8 && !fields[5].isEmpty()) {
+                        LocalDateTime startTime = LocalDateTime.parse(fields[5]);
+                        Duration duration = Duration.ofMinutes(Long.parseLong(fields[6]));
+                        subtask = new Subtask(
+                                fields[2],
+                                fields[4],
+                                Integer.parseInt(fields[0]),
+                                Status.valueOf(fields[3]),
+                                Integer.parseInt(fields[7]),
+                                startTime,
+                                duration
+                        );
+                    } else {
+                        subtask = new Subtask(
+                                fields[2],
+                                fields[4],
+                                Integer.parseInt(fields[0]),
+                                Status.valueOf(fields[3]),
+                                Integer.parseInt(fields[7])
+                        );
+                    }
                     taskManager.subtaskMap.put(subtask.getId(), subtask);
                     if (subtask.getId() > taskManager.taskID) {
                         taskManager.taskID = subtask.getId();

@@ -47,7 +47,7 @@ public class EpicTest {
         Epic epic = new Epic("Эпик 1", "Описание эпика 1", 1);
         Subtask subtask = new Subtask("Подзадача 1", "Описание подзадачи 1", 1, Status.NEW, 1);
         epic.addSubtask(subtask);
-        epic.updateStatus();
+        epic.updateStatus(Status.NEW);
         assertEquals(Status.NEW, epic.getStatus());
     }
 }
