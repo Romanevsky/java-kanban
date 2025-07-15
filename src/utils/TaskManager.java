@@ -7,6 +7,7 @@ import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public interface TaskManager {
@@ -65,4 +66,14 @@ public interface TaskManager {
                 throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
         }
     }
+
+    default List<Task> getPrioritizedTasks() {
+        List<Task> allTasks = getAllTasks();
+        return allTasks.stream()
+                .filter(task -> task.getStartTime() != null)
+                .sorted(Comparator.comparing(Task::getStartTime))
+                .toList();
+    }
+
+    List<Task> getAllTasks();
 }

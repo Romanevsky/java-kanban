@@ -68,9 +68,6 @@ public class InMemoryTaskManager implements TaskManager {
             return false;
         }
 
-        LocalDateTime start = task.getStartTime();
-        LocalDateTime end = task.getEndTime();
-
         return prioritizedTasks.stream()
                 .anyMatch(other -> intersects(other, task));
     }
@@ -292,4 +289,13 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
+
+    @Override
+    public List<Task> getAllTasks() {
+        List<Task> allTasks = new ArrayList<>(taskMap.values());
+        allTasks.addAll(subtaskMap.values());
+        allTasks.addAll(epicMap.values());
+        return allTasks;
+    }
+
 }
