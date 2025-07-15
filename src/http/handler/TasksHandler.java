@@ -1,21 +1,21 @@
 package http.handler;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import entity.TaskType;
-import http.HttpTaskServer;
 import model.Task;
+import utils.TaskManager;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
-    private final HttpTaskServer server;
 
-    public TasksHandler(HttpTaskServer server) {
-        this.server = server;
+    public TasksHandler(Gson gson, TaskManager taskManager) {
+        super(gson, taskManager);
     }
 
     @Override
@@ -44,8 +44,8 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleGetTasks(HttpExchange exchange, String path) throws IOException {
         if (path.equals("/tasks")) {
-            List<Task> tasks = server.getTaskManager().getTasks();
-            sendText(exchange, server.getGson().toJson(tasks), 200);
+            List<Task> tasks = getTaskManager().getTasks();
+            sendText(exchange, getGson().toJson(tasks), 200);
         } else {
             sendNotFound(exchange);
         }
@@ -54,9 +54,9 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handlePostTask(HttpExchange exchange) throws IOException {
         String json = readRequest(exchange);
         try {
-            Task task = server.getGson().fromJson(json, Task.class);
-            server.getTaskManager().addNewTask(task);
-            sendText(exchange, server.getGson().toJson(task), 201);
+            Task task = getGson().fromJson(json, Task.class);
+            getTaskManager().addNewTask(task);
+            sendText(exchange, getGson().toJson(task), 201);
         } catch (JsonSyntaxException e) {
             sendServerError(exchange);
         }
@@ -64,7 +64,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleDeleteTask(HttpExchange exchange, String path) throws IOException {
         if (path.equals("/tasks")) {
-            server.getTaskManager().deleteAllTypeTasks(TaskType.TASK);
+            getTaskManager().deleteAllTypeTasks(TaskType.TASK);
             sendText(exchange, "Tasks deleted", 200);
         } else {
             sendNotFound(exchange);

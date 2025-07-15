@@ -1,18 +1,19 @@
 package http.handler;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import http.HttpTaskServer;
 import model.Subtask;
+import utils.TaskManager;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
-    private final HttpTaskServer server;
 
-    public SubtasksHandler(HttpTaskServer server) {
-        this.server = server;
+    public SubtasksHandler(Gson gson, TaskManager taskManager) {
+        super(gson, taskManager);
     }
 
     @Override
@@ -23,17 +24,16 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
 
             if (method.equals("GET")) {
                 if (path.equals("/subtasks")) {
-                    List<Subtask> subtasks = server.getTaskManager().getSubtasks();
-                    sendText(exchange, server.getGson().toJson(subtasks), 200);
+                    List<Subtask> subtasks = getTaskManager().getSubtasks();
+                    sendText(exchange, getGson().toJson(subtasks), 200);
                 } else {
                     sendNotFound(exchange);
                 }
             } else if (method.equals("POST")) {
-                // Реализация POST-запроса для создания подзадачи
                 String json = readRequest(exchange);
-                Subtask subtask = server.getGson().fromJson(json, Subtask.class);
-                server.getTaskManager().addNewSubtask(subtask);
-                sendText(exchange, server.getGson().toJson(subtask), 201);
+                Subtask subtask = getGson().fromJson(json, Subtask.class);
+                getTaskManager().addNewSubtask(subtask);
+                sendText(exchange, getGson().toJson(subtask), 201);
             } else {
                 sendNotFound(exchange);
             }
